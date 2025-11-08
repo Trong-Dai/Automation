@@ -1,0 +1,51 @@
+---
+- name: Tự động hóa Tác vụ Checkpoint
+  hosts: checkpoint_sms
+  gather_facts: no
+
+  tasks:
+    # -----------------------------------------------
+    # TASK 1: TẠO SNAPSHOT
+    # -----------------------------------------------
+    - name: 1. Tạo Snapshot hệ thống
+      check_point.mgmt.cp_mgmt_snapshot:
+        name: "snapshot_truoc_thay_doi_{{ ansible_date_time.iso8601_basic_short }}"
+        description: "Snapshot tự động bởi Ansible"
+      tags:
+        - snapshot
+
+      # Lưu ý: Tạo snapshot sẽ tự động publish (Discard) mọi thay đổi chưa được publish
+      # Hãy đảm bảo không có session nào đang edit trước khi chạy.
+
+    # -----------------------------------------------
+    # TASK 2: BACKUP CẤU HÌNH
+    # -----------------------------------------------
+    - name: 2. Backup cấu hình (Tải về máy Ansible)
+      check_point.mgmt.cp_mgmt_backup:
+        output_file: "./checkpoint_backup_{{ inventory_hostname }}_{{ ansible_date_time.iso8601_basic_short }}.tgz"
+      tags:
+        - backup
+	# -----------------------------------------------
+    # TASK 3: RESTORE CẤU HÌNH (RẤT NGUY HIỂM)
+    # -----------------------------------------------
+    # - name: 3. KÍCH HOẠT RESTORE (CẢNH BÁO NGUY HIỂM)
+      # block:
+        # - name: Yêu cầu xác nhận restore
+          # ansible.builtin.pause:
+            # prompt: |
+              # !!!!!!!!!!!!!!!!!!!! CẢNH BÁO !!!!!!!!!!!!!!!!!!!!
+              # Bạn đang chuẩn bị RESTORE cấu hình từ file 'backup_file_tren_sms.tgz'.
+              # Việc này sẽ GHI ĐÈ toàn bộ cấu hình hiện tại và NGẮT KẾT NỐI tất cả admin.
+              # Đây là file backup NẰM SẴN TRÊN MÁY CHỦ SMS, không phải file bạn vừa tải về.
+
+              # Nhấn [Enter] để tiếp tục, hoặc nhấn [Ctrl+C] rồi [A] để HỦY BỎ.
+
+        # - name: Tiến hành Restore từ file trên SMS
+          # check_point.mgmt.cp_mgmt_restore:
+            # file_path: "/opt/ansible/Automation/group_vars/Backup/backup_file_tren_sms.tgz" # THAY ĐỔI ĐƯỜNG DẪN NÀY
+            # file_path là đường dẫn tới file backup NẰM TRÊN MÁY CHỦ SMS.
+            # Nếu bạn muốn restore từ file vừa backup (ở Task 2), 
+            # bạn cần upload file đó lên SMS trước.
+
+      # tags:
+        # - restore # Không bao giờ chạy tag này nếu không chắc chắn

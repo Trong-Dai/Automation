@@ -1,0 +1,28 @@
+- name: Create EC2 instance
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  collections:
+  - amazon.aws
+  vars:
+    aws_region: ap-southeast-1
+    instance_name: demo-server
+    key_name: root
+    instance_type: t2.micro
+    image_id: ami-00d8fc944fb171e29
+  tasks:
+  - name: Launch EC2
+    amazon.aws.ec2_instance:
+      name: '{{ instance_name }}'
+      region: '{{ aws_region }}'
+      instance_type: '{{ instance_type }}'
+      key_name: '{{ key_name }}'
+      image_id: '{{ image_id }}'
+      wait: true
+      network:
+        assign_public_ip: false
+    register: ec2_result
+  - name: Show Private IP
+    debug:
+      msg: "IP Private c\u1EE7a m\xE1y ch\u1EE7 l\xE0 {{ ec2_result.instances[0].private_ip_address\
+        \ }}"

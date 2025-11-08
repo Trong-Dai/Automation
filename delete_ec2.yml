@@ -1,0 +1,19 @@
+---
+- name: Xóa (Terminate) EC2 Instance
+  hosts: localhost   # Chạy trên chính máy Ansible
+  connection: local
+  gather_facts: no
+
+  vars:
+    # --- THAY ĐỔI CÁC GIÁ TRỊ NÀY ---
+    instance_id_to_delete: "i-02d87574ae3bf6b8b"  # THAY BẰNG ID CỦA INSTANCE BẠN MUỐN XÓA
+    aws_region: "ap-southeast-1"                 # THAY BẰNG REGION CỦA INSTANCE
+    # -------------------------------
+
+  tasks:
+    - name: Xóa (Terminate) instance
+      ansible.aws.ec2_instance:
+        instance_ids:
+          - "{{ instance_id_to_delete }}"
+        region: "{{ aws_region }}"
+        state: absent  # <--- CHÌA KHÓA ĐỂ XÓA (TERMINATE)

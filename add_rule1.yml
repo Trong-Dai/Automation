@@ -1,0 +1,32 @@
+- name: Add Check Point Firewall Rule
+  hosts: checkpoint
+  connection: httpapi
+
+  tasks:
+
+  - name: 1. Đảm bảo Network Object 10.0.0.0/16 tồn tại
+    check_point.mgmt.cp_mgmt_network:
+      name: "10.0.0.0/16"  # Tên bạn muốn dùng cho object
+      subnet: "10.0.0.0"
+      mask_length: 16
+      state: present
+
+  - name: Add access rule
+    check_point.mgmt.cp_mgmt_access_rule:
+      layer: "Network"
+      name: "Ansible Rule Demo"
+      position: 1
+      source: "Any"
+      destination: "10.0.0.0/16"
+      service: "http"
+      action: "Accept"
+    register: result
+
+  - name: Publish
+    check_point.mgmt.cp_mgmt_publish:
+    when: result.changed == true
+
+  - name: Install policy
+    check_point.mgmt.cp_mgmt_install_policy:
+      policy_package: "Standard"
+      targets: "i-0ea01dd8dd951189d"

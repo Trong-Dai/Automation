@@ -1,0 +1,20 @@
+- name: Xóa Check Point Firewall Rule
+  hosts: checkpoint
+  connection: httpapi
+
+  tasks:
+  - name: Xóa access rule
+    check_point.mgmt.cp_mgmt_access_rule:
+      layer: "Network"
+      name: "Ansible Rule Demo"  # <-- Phải khớp 100% với tên rule bạn đã tạo
+      state: absent             # <-- Thay 'position' và các trường khác bằng 'state: absent'
+    register: result
+
+  - name: Publish
+    check_point.mgmt.cp_mgmt_publish:
+    when: result.changed == true
+
+  - name: Install policy
+    check_point.mgmt.cp_mgmt_install_policy:
+      policy_package: "Standard"
+      targets: "i-0ea01dd8dd951189d" # <-- Sửa lại target "All" thành target đúng

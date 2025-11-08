@@ -1,0 +1,18 @@
+- name: Xóa (Terminate) EC2 Instance
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  tasks:
+    - name: Xóa instance bằng Instance ID
+      amazon.aws.ec2_instance:
+        instance_ids:
+          - "{{ instance_id_to_delete }}" # Biến chứa ID của instance
+        region: ap-southeast-1             # Biến chứa Region của instance
+        state: absent                      # Yêu cầu trạng thái là "vắng mặt" (đã xóa)
+        wait: yes                          # Chờ cho đến khi instance bị terminate hoàn toàn
+      register: ec2_info
+
+    - name: In kết quả
+      debug:
+        var: ec2_info

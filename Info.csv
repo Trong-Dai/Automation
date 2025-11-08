@@ -1,0 +1,2 @@
+key_name,instance_name,aws_region,instance_type,image_id
+root,demo-server,ap-southeast-1,t2.micro,ami-00d8fc944fb171e29

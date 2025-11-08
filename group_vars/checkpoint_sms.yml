@@ -1,0 +1,11 @@
+--
+# Thông tin đăng nhập API
+ansible_user: "lab1"
+ansible_password: "vpb@#2025"
+
+# Cấu hình kết nối Ansible
+ansible_connection: httpapi
+ansible_network_os: check_point.mgmt.checkpoint
+ansible_httpapi_use_ssl: yes
+ansible_httpapi_validate_certs: no
+# Đặt thành 'yes' trong môi trường production nếu bạn có cert hợp lệ

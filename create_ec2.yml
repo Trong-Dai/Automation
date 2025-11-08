@@ -1,0 +1,31 @@
+ name: Create EC2 instance
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  collections:
+    - amazon.aws
+
+  vars:
+    aws_region: ap-southeast-1
+    instance_name: demo-server
+    key_name: root
+    instance_type: t2.micro
+    image_id: ami-00d8fc944fb171e29 # Thay AMI Amazon Linux
+
+
+  tasks:
+    - name: Launch EC2
+      amazon.aws.ec2_instance:
+        name: "{{ instance_name }}"
+        region: "{{ aws_region }}"
+        instance_type: "{{ instance_type }}"
+        key_name: "{{ key_name }}"
+        image_id: "{{ image_id }}"
+        wait: yes
+        network:
+          assign_public_ip: no
+      register: ec2_result
+
+    - name: Show Private IP
+      debug:
+        msg: "IP Private của máy chủ là {{ ec2_result.instances[0].private_ip_address }}"
